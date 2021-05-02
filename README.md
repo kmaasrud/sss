@@ -1,2 +1,1 @@
-# sss
-Simple slide show
+# `sss` - Simple Slide Show
