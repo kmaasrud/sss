@@ -1,15 +1,11 @@
 mod slide;
+mod parse;
 
-use std::fs::File;
-use std::io::{self, BufRead};
+use slide::Slide;
 
 fn main() {
-    let file = File::open("test").unwrap();
-    for line in io::BufReader::new(file).lines() {
-        if let Ok(s) = line {
-            if s.trim().is_empty() {
-                println!("Is empty line");
-            }
-        }
+    let slides = parse::parse().unwrap();
+    for slide in slides.iter() {
+        println!("{}\n", slide.text); 
     }
 }
