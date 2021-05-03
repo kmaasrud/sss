@@ -1,5 +1,4 @@
 mod slide;
-mod parse;
 
 use slide::*;
 

@@ -52,7 +52,6 @@ impl<'a> Iterator for Slides<'a> {
     }
 }
 
-#[derive(Debug)]
 pub struct Slide {
     pub text: String,
     pub linecount: usize,
