@@ -1,11 +1,14 @@
 mod slide;
 mod parse;
 
-use slide::Slide;
+use slide::*;
 
 fn main() {
-    let slides = parse::parse().unwrap();
-    for slide in slides.iter() {
-        println!("{}\n", slide.text); 
+    let slides = match Slides::new("test") {
+        Ok(slides) => slides,
+        Err(_) => panic!("Could not find a file"),
+    };
+    for slide in slides {
+        println!("{}\n---", slide.text); 
     }
 }

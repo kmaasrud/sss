@@ -1,3 +1,57 @@
+use std::{
+    io::{BufRead, BufReader, Lines, Error},
+    fs::File,
+    iter::Iterator,
+};
+
+pub struct Slides<'a> {
+    filepath: &'a str,
+    lines: Lines<BufReader<File>>,
+}
+
+impl<'a> Slides<'a> {
+    pub fn new(path: &'a str) -> Result<Self, Error> {
+        let file = File::open(path)?;
+        Ok(Slides{ filepath: path, lines: BufReader::new(file).lines() })
+    }
+}
+
+impl<'a> Iterator for Slides<'a> {
+    type Item = Slide;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut slide = Slide::new();
+        loop {
+            match self.lines.next() {
+                Some(line) => {
+                    if let Ok(s) = line {
+                        match (slide.linecount, s.trim().is_empty()) {
+                            // Empty line and no previously begun slide. Just continue
+                            (0, true) => continue,
+
+                            // Non-empty line and previously begun slide. Push the line
+                            (_, false) => slide.push_line(&s),
+
+                            // Empty line and previously begun slide. Append the slide to the collection and
+                            // create new one.
+                            (_, true) => {
+                                return Some(slide)
+                            },
+                        }
+                    }
+                }
+                None => {
+                    if slide.linecount != 0 {
+                        return Some(slide)
+                    } else {
+                        return None
+                    }
+                },
+            }
+        }        
+    }
+}
+
 #[derive(Debug)]
 pub struct Slide {
     pub text: String,
