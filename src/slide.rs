@@ -2,21 +2,22 @@ use std::{
     io::{BufRead, BufReader, Lines, Error},
     fs::File,
     iter::Iterator,
+    path::PathBuf,
 };
 
-pub struct Slides<'a> {
-    filepath: &'a str,
+pub struct Slides {
+    filepath: PathBuf,
     lines: Lines<BufReader<File>>,
 }
 
-impl<'a> Slides<'a> {
-    pub fn new(path: &'a str) -> Result<Self, Error> {
+impl Slides {
+    pub fn new(path: &str) -> Result<Self, Error> {
         let file = File::open(path)?;
-        Ok(Slides{ filepath: path, lines: BufReader::new(file).lines() })
+        Ok(Slides{ filepath: PathBuf::from(path), lines: BufReader::new(file).lines() })
     }
 }
 
-impl<'a> Iterator for Slides<'a> {
+impl Iterator for Slides {
     type Item = Slide;
 
     fn next(&mut self) -> Option<Self::Item> {
