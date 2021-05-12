@@ -5,19 +5,19 @@ use std::{
     path::PathBuf,
 };
 
-pub struct Slides {
+pub struct Presentation {
     filepath: PathBuf,
     lines: Lines<BufReader<File>>,
 }
 
-impl Slides {
+impl Presentation {
     pub fn new(path: &str) -> Result<Self, Error> {
         let file = File::open(path)?;
-        Ok(Slides{ filepath: PathBuf::from(path), lines: BufReader::new(file).lines() })
+        Ok(Presentation{ filepath: PathBuf::from(path), lines: BufReader::new(file).lines() })
     }
 }
 
-impl Iterator for Slides {
+impl Iterator for Presentation {
     type Item = Slide;
 
     fn next(&mut self) -> Option<Self::Item> {

@@ -3,7 +3,7 @@ mod slide;
 use slide::*;
 
 fn main() {
-    let slides = match Slides::new("test") {
+    let slides = match Presentation::new("test") {
         Ok(slides) => slides,
         Err(_) => panic!("Could not find a file"),
     };
