@@ -8,6 +8,6 @@ fn main() {
         Err(_) => panic!("Could not find a file"),
     };
     for slide in slides {
-        println!("{}\n---", slide.text); 
+        println!("{}\n---", slide.text);
     }
 }
