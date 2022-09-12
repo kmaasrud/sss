@@ -40,7 +40,9 @@
         # `nix develop`
         devShell = mkShell {
           inherit nativeBuildInputs;
-          buildInputs = with pkgs; [ rust-bin.nightly.latest.default ];
+          buildInputs = with pkgs; [ (rust-bin.selectLatestNightlyWith (toolchain: toolchain.default.override {
+            extensions = ["rust-src"];
+          })) ];
         };
       }
     );
