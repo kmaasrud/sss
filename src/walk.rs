@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::ffi::OsStr;
 use std::fs::ReadDir;
 use std::path::{Path, PathBuf};
 
@@ -9,13 +10,25 @@ enum WalkNode {
 
 pub struct RecursiveWalker {
     stack: Vec<WalkNode>,
+    extension_filter: Option<String>,
 }
 
 impl RecursiveWalker {
     pub fn new<P: AsRef<Path>>(path: P) -> Result<Self, Box<dyn Error>> {
         let stack = vec![WalkNode::Dir(path.as_ref().read_dir()?)];
 
-        Ok(Self { stack })
+        Ok(Self {
+            stack,
+            extension_filter: None,
+        })
+    }
+
+    #[must_use]
+    pub fn extension_filter(self, filter: impl Into<String>) -> Self {
+        Self {
+            extension_filter: Some(filter.into()),
+            ..self
+        }
     }
 }
 
@@ -35,7 +48,13 @@ impl Iterator for RecursiveWalker {
                         }
                     });
                 }
-                Some(WalkNode::File(path)) => return Some(path),
+                Some(WalkNode::File(path)) => match (&self.extension_filter, path.extension()) {
+                    (None, _) => return Some(path),
+                    (Some(ext_filter), Some(ext)) if OsStr::new(ext_filter) == ext => {
+                        return Some(path)
+                    }
+                    _ => {}
+                },
                 None => return None,
             }
         }
