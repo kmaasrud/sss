@@ -1,5 +1,5 @@
 mod template;
-pub use template::{preprocess, render, render_template_file, render_template_file_to_string};
+pub use template::{preprocess, Template};
 
 mod walk;
 pub use walk::RecursiveWalker;
