@@ -45,10 +45,14 @@ pub fn render<R: BufRead + Send, W: Write + Send>(
         let stdout = cmd.stdout.take().unwrap();
 
         std::thread::scope(|s| {
-            s.spawn(|| preprocess(r, &mut stdin).unwrap());
-            for byte in stdout.bytes().flatten() {
-                w.write_all(&[byte]).unwrap();
-            }
+            s.spawn(|| {
+                stdout.bytes().flatten().for_each(|byte| {
+                    w.write_all(&[byte]).unwrap();
+                })
+            });
+
+            preprocess(r, &mut stdin).unwrap();
+            drop(stdin);
         });
     }
 
