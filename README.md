@@ -9,6 +9,6 @@ has no configuration file, no preferred structure and you decide on how you
 want your rendering done. Templating is done in POSIX shell, and content/local
 variables are passed as environment variables.
 
-sss has no dependencies and is built together with the Rust standard library
-from scratch. This ensures no redundant code is compiled to the final binary,
-which weighs in at only ~300 kB (!!).
+sss has no dependencies and a highly optimized build profile. This ensures
+no redundant code is compiled to the final binary, which weighs in at only
+~350 kB (!!).

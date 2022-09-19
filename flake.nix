@@ -18,15 +18,23 @@
           overlays = [ (import rust) ];
         };
 
-        inherit (pkgs) rustPlatform mkShell stdenv lib;
-        buildInputs = [ ];
+        toolchain =
+          pkgs.rust-bin.selectLatestNightlyWith (toolchain: toolchain.default);
+
+        inherit (pkgs) mkShell stdenv lib;
+        buildInputs = [ toolchain ];
         nativeBuildInputs = [ ];
+
+        rustPlatform = pkgs.makeRustPlatform {
+          rustc = toolchain;
+          cargo = toolchain;
+        };
       in rec {
         # `nix build`
         packages.${pname} = rustPlatform.buildRustPackage {
           inherit pname version buildInputs nativeBuildInputs;
-          src = ./.;
-          cargoSha256 = "";
+          src = lib.cleanSource ./.;
+          cargoSha256 = "sha256-slspldnYxCB0EGq7VBBqggZ9IGZVaxnYC1AZEIqaoM0=";
         };
         packages.default = packages.${pname};
 
@@ -35,13 +43,6 @@
         defaultApp = apps.${pname};
 
         # `nix develop`
-        devShells.default = mkShell {
-          inherit nativeBuildInputs;
-          buildInputs = with pkgs;
-            [
-              (rust-bin.selectLatestNightlyWith (toolchain:
-                toolchain.default.override { extensions = [ "rust-src" ]; }))
-            ];
-        };
+        devShells.default = mkShell { inherit buildInputs nativeBuildInputs; };
       });
 }
