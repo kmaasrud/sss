@@ -3,6 +3,9 @@ name = "sss"
 version = "0.1.0"
 edition = "2021"
 
+[dependencies]
+time = { version = "0.3.14", default-features = false, features = ["std", "macros", "formatting"] }
+
 [profile.release]
 lto = true
 strip = true

@@ -36,6 +36,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         };
 
         tmpl.env("src", src);
+        tmpl.env("time", timestamp(src));
         tmpl.env("srcs", &srcs);
         tmpl.env("path_to_root", path_to_root(src, &src_dir));
         tmpl.env("src_dir", &src_dir);
@@ -89,4 +90,19 @@ fn path_to_root<A: AsRef<Path>, B: AsRef<Path>>(path: A, root: B) -> String {
         .map(|_| "..")
         .intersperse("/")
         .collect()
+}
+
+fn timestamp<P: AsRef<Path>>(src: P) -> String {
+    src.as_ref()
+        .metadata()
+        .map(|md| {
+            md.created()
+                .map(|dt| {
+                    time::OffsetDateTime::from(dt)
+                        .format(&time::format_description::well_known::Rfc3339)
+                        .unwrap()
+                })
+                .unwrap_or(String::new())
+        })
+        .unwrap_or(String::new())
 }

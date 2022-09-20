@@ -34,7 +34,7 @@
         packages.${pname} = rustPlatform.buildRustPackage {
           inherit pname version buildInputs nativeBuildInputs;
           src = lib.cleanSource ./.;
-          cargoSha256 = "sha256-slspldnYxCB0EGq7VBBqggZ9IGZVaxnYC1AZEIqaoM0=";
+          cargoSha256 = "sha256-i7s5QvY34o3UoMj3qjsomRE0lILh5KRK64Wm6/30v4I=";
         };
         packages.default = packages.${pname};
 
