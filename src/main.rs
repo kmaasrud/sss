@@ -25,7 +25,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     tmpl_paths.swap_remove(i);
 
     for src in src_paths.iter() {
-        println!("Looking at {:?}", src);
         let tmpl_path = exchange_dirs(src, &src_dir, &tmpl_dir).with_extension("html");
 
         let mut tmpl = match tmpl_paths.iter().position(|x| *x == tmpl_path) {
@@ -53,7 +52,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     for tmpl_path in tmpl_paths.iter() {
-        println!("Looking at {:?}", tmpl_path);
         let mut tmpl = Template::new(tmpl_path)?;
         tmpl.env("srcs", &srcs);
         tmpl.env("path_to_root", path_to_root(tmpl_path, &tmpl_dir));
