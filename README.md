@@ -5,7 +5,7 @@
 
 sss is a very simple static site generator, meant to give you only the
 necessary functionality and staying out of your way as much as possible. It
-has no configuration file, no dependencies and weighs in at only ~300 kB. 
+has no configuration file, no dependencies and weighs in at only ~350 kB. 
 
 # Directory structure
 
