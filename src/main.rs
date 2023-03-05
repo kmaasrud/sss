@@ -1,8 +1,20 @@
 #![feature(iter_intersperse)]
-use sss::{env_with_default, RecursiveWalker, Template};
+mod template;
+pub use template::{preprocess, Template};
+
+mod walk;
+pub use walk::Walker;
+
 use std::error::Error;
 use std::fs::File;
 use std::path::{Path, PathBuf};
+
+#[macro_export]
+macro_rules! env_with_default {
+    ($env:expr, $default:expr) => {
+        std::env::var_os($env).unwrap_or_else(|| $default.into())
+    };
+}
 
 fn main() -> Result<(), Box<dyn Error>> {
     let src_dir = PathBuf::from(env_with_default!("SSS_SRC", "src"));
@@ -11,12 +23,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     std::fs::create_dir_all(&dst_dir)?;
 
-    let src_paths: Vec<PathBuf> = RecursiveWalker::new(&src_dir)?.collect();
+    let src_paths: Vec<PathBuf> = Walker::new(&src_dir)?.collect();
     let srcs = src_paths.iter().fold(String::new(), |acc, x| {
         format!("{acc}\n{}", x.to_string_lossy())
     });
 
-    let mut tmpl_paths: Vec<PathBuf> = RecursiveWalker::new(&tmpl_dir)?.collect();
+    let mut tmpl_paths: Vec<PathBuf> = Walker::new(&tmpl_dir)?.collect();
 
     let i = tmpl_paths
         .iter()

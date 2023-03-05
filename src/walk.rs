@@ -1,6 +1,5 @@
-use std::error::Error;
-use std::ffi::OsStr;
 use std::fs::ReadDir;
+use std::io;
 use std::path::{Path, PathBuf};
 
 enum WalkNode {
@@ -8,31 +7,29 @@ enum WalkNode {
     File(PathBuf),
 }
 
-pub struct RecursiveWalker {
+pub struct Walker {
     stack: Vec<WalkNode>,
-    extension_filter: Option<String>,
 }
 
-impl RecursiveWalker {
-    pub fn new<P: AsRef<Path>>(path: P) -> Result<Self, Box<dyn Error>> {
-        let stack = vec![WalkNode::Dir(path.as_ref().read_dir()?)];
+impl Walker {
+    pub fn new<P: AsRef<Path>>(path: P) -> io::Result<Self> {
+        let mut stack = Vec::new();
+        let path = path.as_ref();
 
-        Ok(Self {
-            stack,
-            extension_filter: None,
-        })
-    }
-
-    #[must_use]
-    pub fn extension_filter(self, filter: impl Into<String>) -> Self {
-        Self {
-            extension_filter: Some(filter.into()),
-            ..self
+        if path.is_dir() {
+            match path.read_dir() {
+                Ok(read_dir) => stack.push(WalkNode::Dir(read_dir)),
+                Err(e) => return Err(e),
+            }
+        } else {
+            stack.push(WalkNode::File(path.into()));
         }
+
+        Ok(Self { stack })
     }
 }
 
-impl Iterator for RecursiveWalker {
+impl Iterator for Walker {
     type Item = PathBuf;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -42,19 +39,15 @@ impl Iterator for RecursiveWalker {
                     iter.filter_map(|e| e.ok()).for_each(|e| {
                         let path = e.path();
                         if path.is_dir() {
-                            self.stack.push(WalkNode::Dir(path.read_dir().unwrap()));
+                            if let Ok(read_dir) = path.read_dir() {
+                                self.stack.push(WalkNode::Dir(read_dir));
+                            }
                         } else {
                             self.stack.push(WalkNode::File(path));
                         }
                     });
                 }
-                Some(WalkNode::File(path)) => match (&self.extension_filter, path.extension()) {
-                    (None, _) => return Some(path),
-                    (Some(ext_filter), Some(ext)) if OsStr::new(ext_filter) == ext => {
-                        return Some(path)
-                    }
-                    _ => {}
-                },
+                Some(WalkNode::File(path)) => return Some(path),
                 None => return None,
             }
         }
